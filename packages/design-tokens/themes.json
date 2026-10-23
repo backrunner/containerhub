@@ -1,0 +1,14 @@
+{
+  "light": {
+    "canvas": "f2f4f7", "surface": "ffffff", "sidebar": "f7f8fa",
+    "text": "1c2331", "muted": "626f82", "border": "e3e7ee",
+    "primary": "2463eb", "accent": "245cce", "accent_surface": "eaf0fc",
+    "selected": "f0f4fc", "success": "4872bc", "warning": "946112", "danger": "b33a43"
+  },
+  "dark": {
+    "canvas": "0d1016", "surface": "151920", "sidebar": "11151c",
+    "text": "e4e9f2", "muted": "a0aabd", "border": "29303c",
+    "primary": "3067e4", "accent": "8fb5ff", "accent_surface": "1b2c4a",
+    "selected": "1a263b", "success": "8faee4", "warning": "edbf6e", "danger": "f28c94"
+  }
+}

@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
-members = ["crates/core", "crates/host", "crates/management", "crates/providers/apple", "crates/providers/docker", "crates/remote", "apps/agent", "crates/runtime", "apps/bridge"]
-default-members = ["crates/core"]
+members = ["crates/core", "crates/host", "crates/management", "crates/runtime", "apps/bridge", "crates/providers/apple", "crates/providers/docker", "crates/remote", "apps/desktop", "apps/agent"]
+default-members = ["apps/desktop"]
 
 [workspace.package]
 version = "0.1.0"
