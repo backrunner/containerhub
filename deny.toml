@@ -1,0 +1,14 @@
+# Check all resolved platforms and features, including unpublished workspace crates.
+[graph]
+all-features = true
+
+[licenses]
+confidence-threshold = 0.8
+allow = [
+    "Apache-2.0", "MIT", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Zlib",
+    "Unicode-3.0", "CC0-1.0", "0BSD", "Unlicense", "CDLA-Permissive-2.0",
+    "MPL-2.0",
+]
+
+[licenses.private]
+ignore = false
