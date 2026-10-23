@@ -1,0 +1,17 @@
+[
+  {
+    "id": "contract-web",
+    "configuration": {
+      "id": "contract-web",
+      "creationDate": "2026-10-22T00:00:00Z",
+      "image": { "reference": "docker.io/library/alpine:3.22", "descriptor": { "digest": "sha256:fixture" } },
+      "resources": { "cpus": 2, "memoryInBytes": 536870912 },
+      "platform": { "os": "linux", "architecture": "arm64" },
+      "initProcess": { "environment": ["PATH=/usr/bin", "API_TOKEN=fixture-secret"] },
+      "networks": [{ "network": "default" }],
+      "mounts": [{ "source": "contract-data", "destination": "/data", "type": { "volume": { "name": "contract-data" } } }],
+      "publishedPorts": [{ "hostAddress": "127.0.0.1", "hostPort": 8080, "containerPort": 80, "proto": "tcp" }]
+    },
+    "status": { "state": "running", "networks": [{ "ipv4Address": "192.168.64.9/24" }] }
+  }
+]

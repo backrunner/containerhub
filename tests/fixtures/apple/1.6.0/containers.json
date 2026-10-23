@@ -1,0 +1,82 @@
+[
+  {
+    "configuration": {
+      "capAdd": [],
+      "capDrop": [],
+      "creationDate": "2026-10-21T19:27:42Z",
+      "dns": {
+        "nameservers": [],
+        "options": [],
+        "searchDomains": []
+      },
+      "id": "containerhub-smoke-20261022",
+      "image": {
+        "descriptor": {
+          "digest": "sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20",
+          "mediaType": "application/vnd.oci.image.index.v1+json",
+          "size": 3929
+        },
+        "reference": "docker.io/library/node:24-bookworm-slim"
+      },
+      "initProcess": {
+        "arguments": [
+          "sleep",
+          "3600"
+        ],
+        "environment": [
+          "PATH=REDACTED",
+          "NODE_VERSION=REDACTED",
+          "YARN_VERSION=REDACTED"
+        ],
+        "executable": "docker-entrypoint.sh",
+        "rlimits": [],
+        "supplementalGroups": [],
+        "terminal": false,
+        "user": {
+          "id": {
+            "gid": 0,
+            "uid": 0
+          }
+        },
+        "workingDirectory": "/"
+      },
+      "labels": {
+        "dev.containerhub.test": "lifecycle-20261022"
+      },
+      "mounts": [],
+      "networks": [
+        {
+          "network": "default",
+          "options": {
+            "hostname": "containerhub-smoke-20261022",
+            "mtu": 1280
+          }
+        }
+      ],
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux"
+      },
+      "publishedPorts": [],
+      "publishedSockets": [],
+      "readOnly": false,
+      "resources": {
+        "cpuOverhead": 1,
+        "cpus": 1,
+        "memoryInBytes": 268435456
+      },
+      "rosetta": false,
+      "runtimeHandler": "container-runtime-linux",
+      "ssh": false,
+      "sysctls": {},
+      "useInit": false,
+      "virtualization": false
+    },
+    "id": "containerhub-smoke-20261022",
+    "status": {
+      "networks": [],
+      "startedDate": "2026-10-21T19:28:32Z",
+      "state": "stopped"
+    }
+  }
+]
