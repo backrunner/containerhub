@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-21",
+  "type": "HTML prototype only",
+  "checks": [
+    {
+      "width": 1440,
+      "pageOverflow": false,
+      "offscreenControls": 0
+    },
+    {
+      "width": 1080,
+      "pageOverflow": false,
+      "offscreenControls": 0
+    },
+    {
+      "width": 1040,
+      "pageOverflow": false,
+      "offscreenControls": 0
+    },
+    {
+      "width": 768,
+      "pageOverflow": false,
+      "offscreenControls": 0
+    },
+    {
+      "width": 390,
+      "pageOverflow": false,
+      "offscreenControls": 0
+    },
+    {
+      "width": 360,
+      "pageOverflow": false,
+      "offscreenControls": 0
+    }
+  ],
+  "consoleErrors": [],
+  "commandPaletteEnter": "passed",
+  "environmentDialog": "passed",
+  "interactionChecks": [
+    "single start/stop",
+    "search and no results",
+    "status filter",
+    "logs pause",
+    "redacted config",
+    "terminal simulation",
+    "duplicate name validation",
+    "port collision validation",
+    "create and delete",
+    "batch partial failure",
+    "retry failed item",
+    "offline disables writes",
+    "reconnect",
+    "empty state",
+    "image pull simulation",
+    "volume create simulation",
+    "command palette keyboard",
+    "environment dialog"
+  ],
+  "interactionResult": "passed",
+  "pageErrors": [],
+  "finalLayoutCheck": "passed; all eight rows fit at 1440x960",
+  "offlineEnvironmentLabel": "passed",
+  "visualRefresh": {
+    "date": "2026-10-22",
+    "version": 2,
+    "tool": "Codex in-app browser via CUA",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "narrowAppWidth": 1080,
+    "pageOverflow": false,
+    "alignment": {
+      "narrowTitleLeft": 303,
+      "narrowSummaryLeft": 303,
+      "metricChartTop": [
+        547.59375,
+        547.59375
+      ]
+    },
+    "checks": [
+      "light/dark theme",
+      "custom SVG brand rendering",
+      "single stop/start final enabled state",
+      "name search",
+      "stopped status filter",
+      "logs tab",
+      "create sheet open/cancel",
+      "batch partial failure",
+      "offline disables create"
+    ],
+    "result": "passed",
+    "consoleErrors": [],
+    "syntaxCheck": "node --check app.js passed",
+    "historicalChecksRerun": false,
+    "screenshots": [
+      "containers-light.png",
+      "containers-dark.png",
+      "container-logs.png",
+      "create-container.png",
+      "runtime-offline.png",
+      "tasks-partial.png",
+      "containers-narrow.png"
+    ]
+  },
+  "brandRefresh": {
+    "date": "2026-10-22",
+    "version": 3,
+    "generator": "built-in image_gen",
+    "assets": [
+      "brand/containerhub-logo-v3.png",
+      "brand/containerhub-app-icon-v3.png"
+    ],
+    "assetDimensions": [
+      1254,
+      1254
+    ],
+    "checks": [
+      "all brand images loaded",
+      "18/32/40 px display",
+      "light/dark app branding",
+      "no horizontal page overflow at 1280 px"
+    ],
+    "screenshots": [
+      "brand/brand-preview-v3.png",
+      "brand/brand-in-ui-light.png",
+      "brand/brand-in-ui-dark.png"
+    ],
+    "interactionChecksRerun": false
+  }
+}

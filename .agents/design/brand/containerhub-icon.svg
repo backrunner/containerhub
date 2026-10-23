@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>ContainerHub app icon</title>
+  <rect width="64" height="64" rx="14" fill="#2463eb"/>
+  <g transform="translate(7 7) scale(.76)" fill="#fff">
+    <path d="M28 10H17L8 19V45L17 54H28V46H21L16 41V23L21 18H28Z"/>
+    <path d="M34 10H42V28H50V10H58V54H50V36H42V54H34Z"/>
+  </g>
+</svg>

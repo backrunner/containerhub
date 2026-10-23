@@ -1,0 +1,22 @@
+/* Container table follows its available pane, including an open inspector. */
+.list-area{container:container-list / inline-size}
+.list-area table{table-layout:fixed}
+.list-area table td{height:56px;padding:6px 4px}
+.list-area table th{padding:0 4px}
+.list-area table .check-cell{width:40px;padding:0 8px 0 12px}
+.list-area .container-state-col{width:76px}
+.list-area .container-cpu-col{width:62px;text-align:right}
+.list-area .container-memory-col{width:84px;text-align:right}
+.list-area table .port-col{display:table-cell;width:104px;padding-left:12px;font-size:10px}
+.list-area table .container-actions-col{width:152px;text-align:right;padding-right:12px}
+.list-area table td:last-child{padding-right:12px}
+.list-area .resource-name,.list-area .resource-sub{max-width:100%;line-height:16px}
+.list-area .resource-sub{margin-top:3px}
+.list-area .sort-controls{gap:4px;flex-shrink:0}
+.list-area .numeric{color:var(--muted)}
+@container container-list (max-width:799px){
+ .container-cpu-col,.container-memory-col{display:none}
+}
+
+.inspector-environment{display:flex;gap:8px;min-width:0}
+.inspector-environment span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
