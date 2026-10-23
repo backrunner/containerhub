@@ -1,0 +1,12 @@
+[package]
+name = "containerhub-host"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+containerhub-core = { path = "../core" }
+sysinfo = { version = "=0.39.6", default-features = false, features = ["system", "disk", "network"] }
