@@ -1,0 +1,57 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, rm, copyFile, chmod, writeFile, readFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { resolve, join } from 'node:path';
+import { ContainerHub } from '../packages/node/index.mjs';
+
+const root = await mkdtemp(join(tmpdir(), 'containerhub-create-start-'));
+const options = { binary: resolve('target/debug/containerhub-bridge'), stateDirectory: join(root, 'state'), mode: 'apple', appleBinary: join(root, 'container-fixture') };
+const stateFile = join(root, 'fixture-state.json');
+const image = 'example.invalid/create-start:v1';
+let client;
+const update = async change => { const state = JSON.parse(await readFile(stateFile)); change(state); await writeFile(stateFile, JSON.stringify(state)); };
+try {
+  await copyFile('tests/fixtures/apple/cli_fixture.py', options.appleBinary); await chmod(options.appleBinary, 0o700);
+  await writeFile(stateFile, JSON.stringify({ images: [image], containers: [], sequence: 0 }));
+  client = await ContainerHub.connect(options);
+  const snapshot = await client.snapshot();
+  assert.equal(snapshot.capabilities.create_and_start, true);
+  const command = (name, enabled = true) => ({ kind: 'create_container', environment: snapshot.environment, spec: { name, image, cpus: 1, memory_mib: 256, options: { start_after_create: enabled } } });
+  const success = await client.execute(command('success'), { operationId: 100 });
+  assert.equal(success.state, 'Succeeded', success.message);
+  assert.equal(success.result.value.state, 'Running');
+  assert.equal((await client.execute(command('stopped', false))).result.value.state, 'Stopped');
+  await update(state => { state.fail_start = true; });
+  const failedCommand = command('partial');
+  failedCommand.spec.options.secret_environment = ['API_TOKEN'];
+  const partial = await client.execute(failedCommand, { operationId: 200, secrets: { API_TOKEN: 'create-start-private-canary' } });
+  assert.equal(partial.state, 'Failed', partial.message);
+  assert.equal(partial.result.value.state, 'Stopped');
+  assert.ok(partial.message.includes('容器已创建'));
+  const key = partial.result.value.key;
+  await client.close(); client = await ContainerHub.connect(options);
+  assert.deepEqual((await client.operation(200)).result, partial.result);
+  assert.equal((await client.submit(failedCommand, { operationId: 200 })).state, 'Failed');
+  assert.ok(!JSON.stringify(await client.operations()).includes('create-start-private-canary'));
+  await update(state => { state.fail_start = false; });
+  const start = { kind: 'lifecycle', key, action: 'Start' };
+  assert.equal((await client.execute(start)).state, 'Succeeded');
+  assert.equal((await client.inspectContainer(key)).container.state, 'Running');
+  // The original create result remains historical; a fresh start has a separate task ID.
+  assert.equal((await client.operation(200)).state, 'Failed');
+  await update(state => { const c = state.containers.find(c => c.id === 'partial'); c.configuration.creationDate = 'external-replacement'; c.status.state = 'stopped'; });
+  assert.equal((await client.execute(start)).state, 'Failed');
+  const calls = () => readFile(join(root, 'arguments.jsonl'), 'utf8').then(text => text.trim().split('\n').map(JSON.parse));
+  let commands = await calls();
+  assert.equal(commands.filter(args => args[0] === 'create' && args.length > 3).length, 3);
+  assert.equal(commands.filter(args => args[0] === 'start' && args[1] === '--').length, 3);
+  assert.ok(!JSON.stringify(commands).includes('create-start-private-canary'));
+  await update(state => { state.missing_commands = ['start']; });
+  assert.equal((await client.diagnostics()).checks.find(c => c.feature === 'create_and_start').available, false);
+  assert.equal((await client.snapshot()).capabilities.create_and_start, false);
+  assert.equal((await client.execute(command('unsupported'))).state, 'Failed');
+  assert.equal((await client.execute(command('creation-still-works', false))).state, 'Succeeded');
+  commands = await calls();
+  assert.equal(commands.filter(args => args[0] === 'create' && args.length > 3).length, 4);
+  console.log('PASS: Node/Apple fixture create-and-start, default stopped, retained partial identity, secret input, restart/dedup, start-only retry, replacement refusal and independent capability');
+} finally { if (client) await client.close(); await rm(root, { recursive: true, force: true }); }

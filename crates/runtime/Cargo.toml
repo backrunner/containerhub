@@ -1,0 +1,19 @@
+[package]
+name = "containerhub-runtime"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+containerhub-docker = { path = "../providers/docker" }
+containerhub-core = { path = "../core" }
+containerhub-apple = { path = "../providers/apple" }
+containerhub-remote = { path = "../remote" }
+anyhow.workspace = true
+async-trait.workspace = true
+
+[features]
+development = ["containerhub-remote/development"]

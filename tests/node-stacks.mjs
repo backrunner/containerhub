@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, copyFile, chmod, writeFile, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { resolve, join } from 'node:path';
+import { ContainerHub } from '../packages/node/index.mjs';
+
+const directory=await mkdtemp(join(tmpdir(),'containerhub-node-stacks-'));
+const dockerBinary=join(directory,'docker');
+const options={binary:resolve('target/debug/containerhub-bridge'),stateDirectory:join(directory,'hub'),mode:'docker',dockerContext:'fixture',dockerBinary};
+const record=(n,service,status)=>({Id:n.toString(16).padStart(64,'0'),Name:`/shop-${service}-1`,Platform:'linux',Config:{Image:'alpine:3.22',Env:['TOKEN=private-fixture-token'],Labels:{'com.docker.compose.project':'shop','com.docker.compose.service':service}},State:{Status:status},HostConfig:{AutoRemove:false},NetworkSettings:{Ports:{},Networks:{}}});
+let hub;
+try {
+  await copyFile('tests/fixtures/docker/cli_fixture.py',dockerBinary);await chmod(dockerBinary,0o700);
+  await writeFile(join(directory,'state.json'),JSON.stringify({containers:[record(1,'api','running'),record(2,'db','exited')]}));
+  await assert.rejects(ContainerHub.connect({...options,dockerContext:'--host=evil'}),TypeError);
+  hub=await ContainerHub.connect(options);
+  const snapshot=await hub.snapshot();assert.equal(snapshot.capabilities.stacks,true);
+  const stacks=await hub.stacks();assert.equal(stacks.length,1);assert.equal(stacks[0].services.length,2);
+  assert.ok(!JSON.stringify(stacks).includes('private-fixture-token'));
+  await assert.rejects(hub.stackCommands('foreign','shop','start'),{kind:'Conflict'});
+  const start=await hub.stackCommands(snapshot.environment,'shop','start');assert.equal(start.length,1);
+  assert.equal((await hub.execute(start[0])).state,'Succeeded');
+  const stop=await hub.stackCommands(snapshot.environment,'shop','stop');assert.equal(stop.length,2);
+  for(const command of stop)assert.equal((await hub.execute(command)).state,'Succeeded');
+  const remove=await hub.stackCommands(snapshot.environment,'shop','remove_stopped');assert.equal(remove.length,2);
+  for(const command of remove)assert.equal((await hub.execute(command)).state,'Succeeded');
+  assert.deepEqual(await hub.stacks(),[]);
+  const calls=(await readFile(join(directory,'arguments.jsonl'),'utf8')).trim().split('\n').map(JSON.parse);
+  assert.ok(calls.every(args=>args[0]==='--context'&&args[1]==='fixture'));
+  assert.ok(!calls.some(args=>args.includes('--force')||args.includes('--volumes')||args.includes('compose')));
+  const state=JSON.parse(await readFile(join(directory,'state.json'),'utf8'));
+  state.swarm={LocalNodeState:'active',ControlAvailable:true};
+  state.services=[{ID:'a'.repeat(25),Version:{Index:12},Spec:{Name:'shop_web',Labels:{'com.docker.stack.namespace':'shop'},Mode:{Replicated:{Replicas:3}},TaskTemplate:{ForceUpdate:0,ContainerSpec:{Image:'nginx:alpine',Env:['TOKEN=private-fixture-token']}}},Endpoint:{Ports:[]}}];
+  await writeFile(join(directory,'state.json'),JSON.stringify(state));
+  const swarm=(await hub.stacks())[0];assert.equal(swarm.kind,'swarm');
+  assert.ok(!JSON.stringify(swarm).includes('private-fixture-token'));
+  await assert.rejects(hub.stackCommands(snapshot.environment,'shop','restart'),{kind:'NotFound'});
+  const service=swarm.services[0].swarm;
+  assert.equal((await hub.execute({kind:'swarm_service',key:service.key,stack:service.stack,version:service.version,action:{kind:'scale',replicas:0}})).state,'Succeeded');
+  assert.equal((await hub.snapshot()).swarm.services[0].desired_replicas,0);
+  const restart=await hub.stackCommands(snapshot.environment,'shop','restart','swarm');
+  assert.equal((await hub.execute(restart[0])).state,'Succeeded');
+  const removal=await hub.stackCommands(snapshot.environment,'shop','remove_services','swarm');
+  assert.equal((await hub.execute(removal[0])).state,'Succeeded');
+  assert.deepEqual(await hub.stacks(),[]);
+  console.log('PASS: Node Docker, Compose and Swarm inventory/plans, scale/restart/remove, persistent operations, identity and volume-preservation guards');
+} finally { if(hub)await hub.close();await rm(directory,{recursive:true,force:true}); }

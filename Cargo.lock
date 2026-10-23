@@ -303,6 +303,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "containerhub-bridge"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "containerhub-core",
+ "containerhub-management",
+ "containerhub-remote",
+ "containerhub-runtime",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "containerhub-core"
 version = "0.1.0"
 dependencies = [
@@ -374,6 +390,18 @@ dependencies = [
  "url",
  "wasm-bindgen",
  "zeroize",
+]
+
+[[package]]
+name = "containerhub-runtime"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "containerhub-apple",
+ "containerhub-core",
+ "containerhub-docker",
+ "containerhub-remote",
 ]
 
 [[package]]
