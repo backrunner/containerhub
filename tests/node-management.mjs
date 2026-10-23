@@ -14,10 +14,14 @@ try {
   await assert.rejects(client.reconcile(999999), { kind: 'NotFound' });
   const diagnostics = await client.diagnostics();
   assert.equal(diagnostics.environment, environment);
-  assert.equal(diagnostics.checks.length, 21);
-  assert.ok(diagnostics.checks.every(check => check.available));
+  const capabilities = new Map(diagnostics.checks.map(check => [check.feature, check.available]));
+  assert.equal(capabilities.size, diagnostics.checks.length, 'diagnostics must not repeat features');
+  for (const feature of ['containers', 'images', 'logs', 'inspect_container', 'inspect_image', 'stats', 'lifecycle', 'pull_image', 'cancel_pull', 'create_container', 'advanced_create', 'rebuild_ports', 'delete_container', 'delete_image']) {
+    assert.equal(capabilities.get(feature), true, `${feature} is required by this management journey`);
+  }
+  assert.equal(capabilities.get('stacks'), false, 'the demo environment does not implement stacks');
   assert.ok(snapshot.containers.every(c => c.label_names.includes('dev.containerhub.demo')));
-  assert.deepEqual(snapshot.capabilities, { rebuild_ports: true, create_advanced: true, create_secrets: true, create_startup: true, create_and_start: true, inspect_container: true, cancel_pull: true, inspect_image: true, delete_image: true, pull_image: true, create_container: true, delete_container: true, stats: true });
+  assert.deepEqual(snapshot.capabilities, { stacks: false, rebuild_ports: true, create_advanced: true, create_secrets: true, create_startup: true, create_and_start: true, inspect_container: true, cancel_pull: true, inspect_image: true, delete_image: true, pull_image: true, create_container: true, delete_container: true, stats: true });
   const image = 'example.invalid/containerhub-test:fixture';
   const progress = [];
   const pull = await client.execute({ kind: 'pull_image', environment, reference: image }, { onProgress: op => progress.push(op.progress) });
