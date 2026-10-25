@@ -84,7 +84,7 @@ impl WorkspaceHost {
                     settings.apple_binary.as_deref()
                 })?
             }
-            Target::Demo => Runtime::demo(),
+            Target::Demo => Runtime::demo()?,
             Target::Docker { context } => {
                 Runtime::docker(context, preference.docker_binary.as_deref())?
             }

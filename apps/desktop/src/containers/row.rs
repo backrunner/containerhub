@@ -140,7 +140,7 @@ fn resource_cell(width: f32, value: String, p: Palette) -> Div {
     div()
         .w(px(width))
         .flex_shrink_0()
-        .text_right()
+        .text_left()
         .text_size(px(11.))
         .text_color(p.muted)
         .child(value)

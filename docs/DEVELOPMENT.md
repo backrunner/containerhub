@@ -1,5 +1,12 @@
 # 原生、远程与公共模块开发记录
 
+2026-10-26：`python3 scripts/package-dev.py` 现在安装独立的
+`/Applications/ContainerHub (Dev).app`；`--no-install` 仅生成同名 dist 开发包。
+Dev 与正式版使用不同的 bundle ID 和设置目录。桌面及 Node 打包入口显式选择
+无示例数据的构建，校验产物并拒绝混入测试数据；示例工作空间仅出现在显式预览中。
+移除当前环境后切回本机，不再切换到示例环境。历史增量中的旧产物路径和验证结论
+保留为当时记录，当前命令以 README 为准。
+
 最新调整：[增量 22：紧凑容器列表](INCREMENT-22.md)、[增量 21：Stack 容器概览](INCREMENT-21.md)。环境表单、Docker Compose 与 Swarm 见 [增量 19](INCREMENT-19.md)；主机概览见 [增量 18](INCREMENT-18.md)。端口重建见 [增量 16](INCREMENT-16.md)。
 
 各增量记录保留当时的验证结果与功能边界。`.local/` 中的本机日志、截图和运行时状态不随源码公开；README 使用的亮暗色原生截图保存在 `docs/images/`。

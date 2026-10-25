@@ -80,7 +80,12 @@ pub(crate) async fn run(command: Command) -> Result<()> {
                 format!("agent:{}:apple:current-user", key.public().id())
             };
             let local: Arc<dyn ManagementClient> = if config.development {
-                Arc::new(containerhub_core::fake::FakeProvider::default())
+                #[cfg(feature = "development")]
+                {
+                    Arc::new(containerhub_core::fake::FakeProvider::default())
+                }
+                #[cfg(not(feature = "development"))]
+                anyhow::bail!("development state requires an explicit development build")
             } else if let Some(context) = &docker_context {
                 Arc::new(containerhub_docker::DockerProvider::new(
                     context,

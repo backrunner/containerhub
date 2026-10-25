@@ -43,7 +43,7 @@ impl Workspace {
             .max_w(px(330.))
             .disabled(loading)
             .accessibility_label("切换工作空间")
-            .tooltip("切换本机、演示或已绑定的远程 Agent")
+            .tooltip("切换本机、Docker 或已绑定的远程 Agent")
             .child(
                 div()
                     .flex()

@@ -18,6 +18,7 @@ pub use create_options::*;
 pub use execution::*;
 pub use inspect::*;
 pub mod environment;
+#[cfg(any(test, feature = "test-support"))]
 pub mod fake;
 pub mod images;
 pub mod log_export;

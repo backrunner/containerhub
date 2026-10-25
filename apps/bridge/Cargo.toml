@@ -20,4 +20,5 @@ tokio.workspace = true
 clap = { version = "4", features = ["derive"] }
 
 [features]
+demo = ["containerhub-runtime/demo"]
 development = ["containerhub-runtime/development"]

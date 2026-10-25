@@ -47,14 +47,20 @@ git clone https://github.com/backrunner/containerhub.git
 cd containerhub
 
 # 显式示例模式，不操作本机容器
-cargo run -p containerhub --locked -- --demo
+cargo run -p containerhub --features demo-preview --locked -- --demo
 
 # 连接当前用户的 Apple container
 cargo run -p containerhub --locked
 
-python3 scripts/package-dev.py   # dist/ContainerHub.app，本地 ad-hoc 签名开发包
+python3 scripts/package-dev.py   # 安装 /Applications/ContainerHub (Dev).app
+python3 scripts/package-dev.py --no-install  # 仅生成 dist/ContainerHub (Dev).app
 python3 scripts/package-node.py  # dist/node，SDK 与当前平台 bridge
 ```
+
+Dev 版使用独立标识 `dev.containerhub.desktop.dev`，设置保存在
+`~/Library/Application Support/ContainerHub (Dev)`，可与正式版并存；开发包使用
+本地 ad-hoc 签名。普通包和 Dev 包均不包含示例数据，也不接受 `--demo`。
+示例仅供显式启用的预览和测试构建使用，预览设置单独保存在 `ContainerHub Preview`。
 
 已有 Docker context 可以从环境管理添加。应用不会自动安装或升级运行时；未知
 Apple CLI 版本保留已核验的读取能力，未验证的写入禁用。Agent 和浏览器模块的
@@ -66,7 +72,7 @@ Apple CLI 版本保留已核验的读取能力，未验证的写入禁用。Agen
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo test --workspace --all-features --locked
-cargo build -p containerhub-bridge --locked
+cargo build -p containerhub-bridge --features demo --locked
 node tests/node-management.mjs
 node tests/node-sdk-failures.mjs
 cargo run -p containerhub --features ui-validation --locked -- --validate-ui

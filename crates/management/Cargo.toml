@@ -16,3 +16,6 @@ serde_json.workspace = true
 tokio.workspace = true
 futures-util = "0.3"
 tempfile = "3"
+
+[dev-dependencies]
+containerhub-core = { path = "../core", features = ["test-support"] }

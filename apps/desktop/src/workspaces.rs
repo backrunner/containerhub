@@ -29,6 +29,10 @@ pub(super) enum Target {
     },
 }
 impl Target {
+    fn available(&self) -> bool {
+        !matches!(self, Self::Demo) || cfg!(feature = "demo-preview")
+    }
+
     pub(super) fn key(&self) -> String {
         match self {
             Self::Local => "local".into(),
@@ -72,7 +76,7 @@ pub(super) fn load(
                 settings.apple_binary.as_deref()
             })?
         }
-        Target::Demo => Runtime::demo(),
+        Target::Demo => Runtime::demo()?,
         Target::Docker { context } => {
             Runtime::docker(context, preference.docker_binary.as_deref())?
         }
@@ -139,12 +143,14 @@ impl WorkspaceHost {
         let mut host = Self {
             preferences: preferences::read(&base),
             base,
-            targets: vec![Target::Local, Target::Demo],
+            targets: vec![Target::Local],
             sessions: HashMap::new(),
             profiles: HashMap::new(),
             active: target.key(),
             loading: false,
         };
+        #[cfg(feature = "demo-preview")]
+        host.remember(Target::Demo);
         for item in saved {
             host.remember(item);
         }
@@ -152,7 +158,7 @@ impl WorkspaceHost {
         host
     }
     fn remember(&mut self, target: Target) {
-        if !self.targets.iter().any(|known| known.key() == target.key()) {
+        if target.available() && !self.targets.iter().any(|known| known.key() == target.key()) {
             self.targets.push(target);
         }
     }
@@ -280,3 +286,38 @@ impl Render for WorkspaceHost {
 
 #[cfg(feature = "ui-validation")]
 pub(crate) mod validation;
+
+#[cfg(all(test, not(feature = "demo-preview")))]
+mod distribution_tests {
+    use super::{Target, WorkspaceHost};
+    use std::{collections::HashMap, path::PathBuf};
+
+    #[test]
+    fn legacy_demo_entry_is_skipped_without_losing_saved_real_environments() {
+        let saved: Vec<Target> = serde_json::from_str(
+            r#"[
+                {"kind":"local"},
+                {"kind":"demo"},
+                {"kind":"docker","context":"my-context"},
+                {"kind":"remote","directory":"/profile","agent":"agent-1","label":"Server"}
+            ]"#,
+        )
+        .unwrap();
+        let mut host = WorkspaceHost {
+            base: PathBuf::new(),
+            targets: vec![Target::Local],
+            preferences: HashMap::new(),
+            sessions: HashMap::new(),
+            profiles: HashMap::new(),
+            active: "local".into(),
+            loading: false,
+        };
+        for target in saved {
+            host.remember(target);
+        }
+        assert_eq!(host.targets.len(), 3);
+        assert!(!host.targets.contains(&Target::Demo));
+        assert_eq!(host.targets[1].key(), "docker:my-context");
+        assert_eq!(host.targets[2].label(), "Server");
+    }
+}

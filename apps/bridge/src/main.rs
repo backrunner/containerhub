@@ -41,7 +41,7 @@ async fn main() -> Result<()> {
     } else if let Some(context) = args.docker_context {
         Runtime::docker(&context, args.docker_binary.as_deref())?
     } else if args.demo {
-        Runtime::demo()
+        Runtime::demo()?
     } else {
         Runtime::apple_at(args.apple_binary.as_deref())?
     };

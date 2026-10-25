@@ -17,3 +17,7 @@ zeroize = "1"
 
 [dev-dependencies]
 tokio.workspace = true
+containerhub-core = { path = ".", features = ["test-support"] }
+
+[features]
+test-support = []

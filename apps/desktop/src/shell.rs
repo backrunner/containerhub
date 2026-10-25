@@ -1,5 +1,18 @@
 use crate::*;
 
+pub(super) const TITLE_BAR_HEIGHT: Pixels = px(54.);
+
+pub(super) fn window_options() -> WindowOptions {
+    WindowOptions {
+        titlebar: Some(TitlebarOptions {
+            // AppKit's 14-point buttons share the toolbar's vertical center.
+            traffic_light_position: Some(point(px(20.), (TITLE_BAR_HEIGHT - px(14.)) / 2.)),
+            ..TitleBar::title_bar_options()
+        }),
+        ..TitleBar::window_options()
+    }
+}
+
 impl Render for Workspace {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let layout = Layout::for_width(f32::from(window.viewport_size().width));
@@ -92,7 +105,7 @@ impl Render for Workspace {
             }))
             .child(
                 TitleBar::new()
-                    .h(px(54.))
+                    .h(TITLE_BAR_HEIGHT)
                     .bg(p.surface)
                     .border_b_1()
                     .border_color(p.border)
@@ -103,7 +116,7 @@ impl Render for Workspace {
                             .w_full()
                             .h_full()
                             .pr(px(20.))
-                            .pl(px((layout.sidebar - 80. + layout.padding).max(0.)))
+                            .pl(px((layout.sidebar - 80. + layout.padding).max(16.)))
                             .gap(px(8.))
                             .text_size(px(12.))
                             .child(self.workspace_picker(p, cx))

@@ -19,4 +19,4 @@ containerhub-remote = { path = "../../crates/remote" }
 clap = { version = "4", features = ["derive"] }
 
 [features]
-development = ["containerhub-remote/development"]
+development = ["containerhub-remote/development", "containerhub-core/test-support"]

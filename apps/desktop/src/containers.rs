@@ -206,9 +206,9 @@ impl Workspace {
                                     .child("状态"),
                             )
                             .when(show_resources, |d| {
-                                d.child(div().w(px(54.)).flex_shrink_0().text_right().child("CPU"))
+                                d.child(div().w(px(54.)).flex_shrink_0().text_left().child("CPU"))
                                     .child(
-                                        div().w(px(76.)).flex_shrink_0().text_right().child("内存"),
+                                        div().w(px(76.)).flex_shrink_0().text_left().child("内存"),
                                     )
                             })
                             .child(div().w(px(96.)).pl(px(8.)).flex_shrink_0().child("端口"))

@@ -1,5 +1,6 @@
 //! Runtime composition for native hosts. Credentials stay in Rust; no UI or Node dependency.
 mod client;
+pub const DEMO_ENABLED: bool = cfg!(feature = "demo");
 pub use client::ClientSlot;
 use containerhub_core::ManagementClient;
 pub use containerhub_remote::client::Endpoint;
@@ -47,14 +48,19 @@ impl Runtime {
             profile_lock: None,
         })
     }
-    pub fn demo() -> Self {
-        Self {
-            client: Arc::new(containerhub_core::fake::FakeProvider::default()),
-            storage_id: "demo".into(),
-            remote_label: None,
-            demo: true,
-            profile_lock: None,
+    pub fn demo() -> anyhow::Result<Self> {
+        #[cfg(feature = "demo")]
+        {
+            Ok(Self {
+                client: Arc::new(containerhub_core::fake::FakeProvider::default()),
+                storage_id: "demo".into(),
+                remote_label: None,
+                demo: true,
+                profile_lock: None,
+            })
         }
+        #[cfg(not(feature = "demo"))]
+        anyhow::bail!("示例数据未包含在此构建中；预览需要显式启用 demo feature")
     }
     pub fn remote(directory: &Path, agent: Option<&str>) -> anyhow::Result<Self> {
         RemoteProfile::open(directory)?.runtime(agent)
@@ -185,3 +191,14 @@ pub fn validate_connection(
 
 #[cfg(all(test, feature = "development"))]
 mod tests;
+
+#[cfg(all(test, not(feature = "demo")))]
+mod distribution_tests {
+    #[test]
+    fn ordinary_runtime_rejects_demo_instead_of_returning_sample_resources() {
+        let error = super::Runtime::demo()
+            .err()
+            .expect("demo must be unavailable");
+        assert!(error.to_string().contains("示例数据未包含在此构建中"));
+    }
+}

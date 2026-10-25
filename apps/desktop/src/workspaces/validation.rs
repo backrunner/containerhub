@@ -22,7 +22,7 @@ pub(crate) fn run(snapshot: &Snapshot) {
                     })),
                     focus: false,
                     show: false,
-                    ..TitleBar::window_options()
+                    ..shell::window_options()
                 },
                 cx,
                 |window, cx| {
@@ -233,7 +233,59 @@ pub(crate) fn run(snapshot: &Snapshot) {
     })
     .unwrap();
     cx.run_until_parked();
+    // Removing an active real environment must return to the local session,
+    // even when this test build also has a demo session available.
+    cx.update_window(handle, |_, window, cx| {
+        host.update(cx, |host, cx| {
+            let target = Target::Docker {
+                context: "fixture".into(),
+            };
+            let (backend, events, _, _) = Backend::isolated();
+            let weak = cx.entity().downgrade();
+            let view = cx.new(|cx| {
+                let mut view = Workspace::with_backend(
+                    window,
+                    cx,
+                    Settings::default(),
+                    backend,
+                    events,
+                    false,
+                );
+                view.workspace_host = Some(weak);
+                view.environment.target = target.clone();
+                view.receive(Event::Snapshot(Ok(snapshot.clone())));
+                view
+            });
+            host.sessions.insert(
+                target.key(),
+                Session {
+                    view,
+                    client: Arc::new(ClientSlot::new(Arc::new(
+                        containerhub_core::fake::FakeProvider::default(),
+                    ))),
+                    _lock: File::open("/dev/null").unwrap(),
+                    _profile_lock: None,
+                },
+            );
+            host.select(target.key(), window, cx);
+            host.remove_environment(target, window, cx);
+        });
+        window.render_frame(cx);
+        window.click("ok", cx);
+        assert_eq!(host.read(cx).active, "local");
+        assert!(!host.read(cx).sessions.contains_key("docker:fixture"));
+        assert!(
+            !host
+                .read(cx)
+                .targets
+                .iter()
+                .any(|t| t.key() == "docker:fixture")
+        );
+        assert!(host.read(cx).sessions.contains_key("demo"));
+    })
+    .unwrap();
+    cx.run_until_parked();
     println!(
-        "PASS workspace switcher: isolated sessions preserve search/filter/selection; inactive polling pauses"
+        "PASS workspace switcher: isolated sessions preserve search/filter/selection; inactive polling pauses; removal returns to local"
     );
 }

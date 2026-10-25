@@ -347,11 +347,11 @@ impl WorkspaceHost {
                             return;
                         }
                         if host.active == target.key() {
-                            if host.sessions.contains_key("demo") {
-                                host.select("demo".into(), window, cx);
+                            if host.sessions.contains_key("local") {
+                                host.select("local".into(), window, cx);
                             } else {
-                                match load(&host.base, &Target::Demo, None) {
-                                    Ok(loaded) => host.install(Target::Demo, loaded, window, cx),
+                                match load(&host.base, &Target::Local, None) {
+                                    Ok(loaded) => host.install(Target::Local, loaded, window, cx),
                                     Err(e) => {
                                         host.targets = saved;
                                         let _ = host.save_catalog();
@@ -367,7 +367,7 @@ impl WorkspaceHost {
                             .iter()
                             .find(|t| t.key() == host.active)
                             .cloned()
-                            .unwrap_or(Target::Demo);
+                            .unwrap_or(Target::Local);
                         host.inspect_environment(current, cx);
                         cx.notify();
                     });

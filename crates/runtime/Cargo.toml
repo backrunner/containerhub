@@ -16,4 +16,5 @@ anyhow.workspace = true
 async-trait.workspace = true
 
 [features]
+demo = ["containerhub-core/test-support"]
 development = ["containerhub-remote/development"]

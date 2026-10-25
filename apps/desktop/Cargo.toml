@@ -28,9 +28,11 @@ chrono = { version = "0.4", default-features = false, features = ["std"] }
 rust-embed = { version = "8", features = ["debug-embed"] }
 
 [features]
-demo-preview = []
-ui-validation = ["gpui-kit/test-support"]
+dev-build = []
+demo-preview = ["containerhub-runtime/demo"]
+ui-validation = ["demo-preview", "gpui-kit/test-support"]
 remote-development = ["containerhub-runtime/development"]
 
 [dev-dependencies]
 async-trait.workspace = true
+containerhub-core = { path = "../../crates/core", features = ["test-support"] }

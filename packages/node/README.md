@@ -1,20 +1,20 @@
 # @containerhub/node
 
-Node 22+ 的 ESM/TypeScript SDK，通过 `containerhub-bridge` 子进程复用 Rust 管理模块。支持 Apple container、Docker context、显式 Demo、已绑定远程 Agent；不依赖 GPUI。当前是本地开发包，尚未发布 npm。
+Node 22+ 的 ESM/TypeScript SDK，通过 `containerhub-bridge` 子进程复用 Rust 管理模块。支持 Apple container、Docker context、已绑定远程 Agent；不依赖 GPUI。当前是本地开发包，尚未发布 npm。打包的 bridge 不包含示例数据；Demo 仅用于显式启用 `demo` feature 的测试构建。
 
 ## 构建与使用
 
 在仓库根目录执行：
 
 ```sh
-cargo build -p containerhub-bridge --locked
+cargo build -p containerhub-bridge --features demo --locked
 node tests/node-management.mjs  # 使用临时目录和示例数据，不操作本机容器
 node tests/node-sdk-failures.mjs # 异常退出、断线 operation ID 与关闭超时
 node tests/node-diagnostics.mjs # 隔离 CLI、离线诊断与参数能力门禁
 node tests/node-runtime-service.mjs # 隔离 CLI、服务启动、持久化核对与重启不重放
 ```
 
-以下示例从仓库根目录运行。改成 `mode: 'apple'` 会连接当前用户的真实 Apple container，资源操作的环境 ID 从快照读取；离线服务启动使用 diagnostics 返回的环境 ID。
+以下示例从仓库根目录运行，需要上面的 `demo` 测试构建；普通打包版本会拒绝此模式。改成 `mode: 'apple'` 会连接当前用户的真实 Apple container，资源操作的环境 ID 从快照读取；离线服务启动使用 diagnostics 返回的环境 ID。
 
 ```js
 import { ContainerHub } from './packages/node/index.mjs';

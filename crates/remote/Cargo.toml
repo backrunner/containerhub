@@ -39,6 +39,7 @@ getrandom = { version = "0.3", features = ["wasm_js"] }
 getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
 
 [dev-dependencies]
+containerhub-core = { path = "../core", features = ["test-support"] }
 tempfile = "3"
 async-channel.workspace = true
 

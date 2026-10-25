@@ -87,7 +87,7 @@ pub fn run() {
                             })),
                             focus: false,
                             show: false,
-                            ..TitleBar::window_options()
+                            ..shell::window_options()
                         },
                         cx,
                         |window, cx| {

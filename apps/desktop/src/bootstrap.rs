@@ -1,12 +1,16 @@
 use crate::*;
 
 pub(super) fn run() {
+    let arguments: Vec<String> = std::env::args().collect();
+    if arguments.iter().any(|arg| arg == "--build-info") {
+        println!("{}", identity::build_info());
+        return;
+    }
     #[cfg(feature = "ui-validation")]
     if std::env::args().any(|arg| arg == "--validate-ui") {
         ui_validation::run();
         return;
     }
-    let arguments: Vec<String> = std::env::args().collect();
     let option = |name: &str| {
         arguments.iter().position(|a| a == name).map(|i| {
             arguments
@@ -17,7 +21,11 @@ pub(super) fn run() {
     };
     let remote_profile = option("--remote-profile").map(PathBuf::from);
     let remote_agent = option("--remote-agent");
-    let demo = cfg!(feature = "demo-preview") || arguments.iter().any(|arg| arg == "--demo");
+    let demo = arguments.iter().any(|arg| arg == "--demo");
+    if demo && !cfg!(feature = "demo-preview") {
+        eprintln!("此构建不包含示例数据；仅显式启用 demo-preview 的预览构建支持 --demo。");
+        std::process::exit(2);
+    }
     assert!(
         !demo || remote_profile.is_none(),
         "--demo and --remote-profile are separate modes"
@@ -25,7 +33,8 @@ pub(super) fn run() {
     let base = std::env::var_os("HOME")
         .map(PathBuf::from)
         .expect("HOME is required")
-        .join("Library/Application Support/ContainerHub");
+        .join("Library/Application Support")
+        .join(identity::DATA_DIRECTORY);
     let (target, cached) = if let Some(profile) = remote_profile {
         let directory = profile.canonicalize().expect("Remote profile directory");
         let profile = containerhub_runtime::RemoteProfile::open(&directory)
@@ -74,11 +83,11 @@ pub(super) fn run() {
                 cx,
             ))),
             window_min_size: Some(size(px(760.), px(560.))),
-            app_id: Some("dev.containerhub.desktop".into()),
-            ..TitleBar::window_options()
+            app_id: Some(identity::APP_ID.into()),
+            ..shell::window_options()
         };
         open_window(options, cx, move |window, cx| {
-            window.set_window_title("ContainerHub");
+            window.set_window_title(identity::NAME);
             cx.new(|cx| workspaces::WorkspaceHost::new(base, target, loaded, window, cx))
         })
         .expect("Unable to open ContainerHub");

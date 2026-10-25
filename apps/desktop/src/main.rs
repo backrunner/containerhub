@@ -1,4 +1,5 @@
 mod backend;
+mod identity;
 mod layout;
 mod logs;
 mod theme;

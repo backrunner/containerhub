@@ -57,7 +57,7 @@ git clone https://github.com/backrunner/containerhub.git
 cd containerhub
 
 # Sample data only; does not operate a container runtime.
-cargo run -p containerhub --locked -- --demo
+cargo run -p containerhub --features demo-preview --locked -- --demo
 
 # Connect to the current user's Apple container runtime.
 cargo run -p containerhub --locked
@@ -68,9 +68,16 @@ install or upgrade runtimes. Unknown Apple CLI versions retain verified read
 capabilities; unverified write operations stay disabled.
 
 ```sh
-python3 scripts/package-dev.py   # dist/ContainerHub.app; local ad-hoc-signed build
+python3 scripts/package-dev.py   # Install /Applications/ContainerHub (Dev).app
+python3 scripts/package-dev.py --no-install  # Only dist/ContainerHub (Dev).app
 python3 scripts/package-node.py  # dist/node; SDK plus this platform's Rust bridge
 ```
+
+The Dev app uses `dev.containerhub.desktop.dev` and stores its settings in
+`~/Library/Application Support/ContainerHub (Dev)`, independently of the release
+app. Packaging uses local ad-hoc signing. Both ordinary and Dev packages exclude
+sample data and reject `--demo`; fixtures require explicit preview/test features
+and use a separate `ContainerHub Preview` data directory.
 
 For Agent setup and browser protocol builds, follow
 [REMOTE-DEVELOPMENT.md](docs/REMOTE-DEVELOPMENT.md). Development credentials are
@@ -83,7 +90,7 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
 cargo test --workspace --all-features --locked
 
-cargo build -p containerhub-bridge --locked
+cargo build -p containerhub-bridge --features demo --locked
 node tests/node-management.mjs
 node tests/node-sdk-failures.mjs
 
